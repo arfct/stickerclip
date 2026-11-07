@@ -14,5 +14,9 @@
 	<array>
 		<string>iCloud.app.stickerclip</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.blacktree.stickerclip</string>
+	</array>
 </dict>
 </plist>

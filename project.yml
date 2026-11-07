@@ -1,0 +1,145 @@
+name: Stickerclip
+options:
+  bundleIdPrefix: com.blacktree
+  deploymentTarget:
+    iOS: "18.0"
+  generateEmptyDirectories: true
+packages:
+  StickerKit:
+    path: StickerKit
+settings:
+  base:
+    DEVELOPMENT_TEAM: TVA9Z8LD95
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "2.0"
+    # Bump for every TestFlight upload.
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    # The shipping suffix. Development installs can override it on the
+    # command line while the real App ID is still registered elsewhere
+    # (see docs/plans/2026-09-19-rebuild.md, Identity):
+    #   MESSAGES_EXTENSION_SUFFIX=messages scripts/device-install.sh
+    MESSAGES_EXTENSION_SUFFIX: MessagesExtension
+
+# Every identifier the three targets share, defined once. The app and its
+# Messages extension keep the IDs the shipping app has had since 2022 so this
+# lands as an upgrade and the extension inherits the container the old
+# stickers are stored in (see docs/plans/2026-09-19-rebuild.md, Identity).
+#
+#   App group:        group.com.blacktree.stickerclip
+#   iCloud container: iCloud.app.stickerclip
+#
+# Mirror any change here into StickerKit/Sources/StickerKit/Identifiers.swift.
+
+targetTemplates:
+  SharedContainers:
+    entitlements:
+      properties:
+        com.apple.security.application-groups:
+          - group.com.blacktree.stickerclip
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.app.stickerclip
+        com.apple.developer.icloud-services:
+          - CloudDocuments
+        com.apple.developer.ubiquity-container-identifiers:
+          - iCloud.app.stickerclip
+
+targets:
+  Stickerclip:
+    type: application
+    platform: iOS
+    templates: [SharedContainers]
+    sources: [App, Shared]
+    dependencies:
+      - package: StickerKit
+      - target: StickerclipMessages
+        embed: true
+      - target: StickerclipShare
+        embed: true
+    info:
+      path: App/Info.plist
+      properties:
+        # XcodeGen writes App/Info.plist from this block; edits to the file
+        # itself are discarded on the next generate.
+        CFBundleDisplayName: Stickerclip
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+        # Makes the sticker folder visible in the Files app under iCloud Drive.
+        NSUbiquitousContainers:
+          iCloud.app.stickerclip:
+            NSUbiquitousContainerIsDocumentScopePublic: true
+            NSUbiquitousContainerName: Stickerclip
+            NSUbiquitousContainerSupportedFolderLevels: None
+    entitlements:
+      path: App/Stickerclip.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blacktree.stickerclip
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  StickerclipMessages:
+    type: app-extension.messages
+    platform: iOS
+    templates: [SharedContainers]
+    sources: [Messages, Shared]
+    dependencies:
+      - package: StickerKit
+    info:
+      path: Messages/Info.plist
+      properties:
+        CFBundleDisplayName: Stickerclip
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.message-payload-provider
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).MessagesViewController
+    entitlements:
+      path: Messages/StickerclipMessages.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blacktree.stickerclip.$(MESSAGES_EXTENSION_SUFFIX)
+        ASSETCATALOG_COMPILER_APPICON_NAME: iMessage App Icon
+
+  StickerclipShare:
+    type: app-extension
+    platform: iOS
+    templates: [SharedContainers]
+    sources: [Share, Shared]
+    dependencies:
+      - package: StickerKit
+    info:
+      path: Share/Info.plist
+      properties:
+        CFBundleDisplayName: Save to Stickerclip
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsImageWithMaxCount: 20
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+    entitlements:
+      path: Share/StickerclipShare.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blacktree.stickerclip.share
+
+schemes:
+  Stickerclip:
+    build:
+      targets:
+        Stickerclip: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - package: StickerKit/StickerKitTests
