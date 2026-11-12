@@ -1,6 +1,7 @@
 ---
 title: Stickerclip
 date: 2022-07
+status: released
 category: product
 tags: [ios]
 url: https://stickerclip.app
@@ -15,7 +16,7 @@ media:
     caption: The site's instructions, with the drawer holding a pasted emoji and, at the right, the Copy command over a photo of a dog
     alt: A web page headed Make stickers from the clipboard, with a picture of the sticker drawer holding an emoji, short paragraphs titled Add a border and Change size, and a phone photo of a bulldog in a red costume under a Copy and Share menu
 credits: [alcor]
-unconfirmed: [credits]
+unconfirmed: [credits, status]
 ---
 
 Stickerclip's first version took its images from one place, the clipboard. An image copied anywhere and then pasted into the app's drawer in Messages becomes an iMessage sticker, which can be given a white border with a soft shadow and one of six sizes. Copied text becomes a sticker as well, set in bold type that is twice as large when the text is three characters or fewer. On the product's site, in the first image, a phone shows a bordered sticker placed on a message.
